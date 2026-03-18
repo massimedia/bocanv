@@ -1,0 +1,16 @@
+{
+  "images": [
+    {
+      "url": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+      "alt": "Restaurant ambiance"
+    },
+    {
+      "url": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+      "alt": "Empanadas"
+    },
+    {
+      "url": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+      "alt": "Bar area"
+    }
+  ]
+}
