@@ -40,4 +40,5 @@ ENV NODE_ENV=production
 EXPOSE 9000
 
 # Only migrate + start - no build at runtime (avoids OOM)
-CMD ["sh", "-c", "npx medusa db:migrate && echo 'Starting server on port' $PORT && exec npx medusa start --host 0.0.0.0 --port ${PORT:-9000}"]
+# Temporarily skip migrations to test if server starts (migrations already ran)
+CMD ["sh", "-c", "echo 'Starting server on port' $PORT && exec npx medusa start --host 0.0.0.0 --port ${PORT:-9000}"]
