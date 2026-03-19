@@ -18,6 +18,8 @@
     "start": "medusa start",
     "start:prod": "medusa db:migrate && medusa start --host 0.0.0.0 --port ${PORT:-9000}",
     "create-admin": "medusa user -e $MEDUSA_ADMIN_EMAIL -p $MEDUSA_ADMIN_PASSWORD",
+    "fix-admin-email": "medusa exec ./src/scripts/fix-admin-email-typo.ts",
+    "reset-admin-password": "medusa exec ./src/scripts/reset-admin-password.ts",
     "dev": "medusa develop",
     "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
     "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
@@ -28,7 +30,8 @@
     "@medusajs/cli": "2.13.1",
     "@medusajs/framework": "2.13.1",
     "@medusajs/medusa": "2.13.1",
-    "@tsc_tech/medusa-plugin-cloudinary": "^1.0.0"
+    "@tsc_tech/medusa-plugin-cloudinary": "^1.0.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@medusajs/test-utils": "2.13.1",
@@ -42,7 +45,6 @@
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
     "vite": "^5.4.14",
     "yalc": "^1.0.0-pre.53"

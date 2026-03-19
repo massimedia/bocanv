@@ -92,6 +92,15 @@ MEDUSA_ADMIN_EMAIL=mail@massimedia.dk MEDUSA_ADMIN_PASSWORD=Ma5terMa55! npm run 
 Use `DATABASE_URL` from Railway (or run this from a machine that can reach the Railway DB).  
 Or use Railway’s **Run Command** if available.
 
+### 2.8 Fix Admin Email Typo (if needed)
+
+If the admin email was created with a typo (e.g. `mail@massiemdia.dk` instead of `mail@massimedia.dk`):
+
+**Option A – Medusa script:** `cd backend` then `DATABASE_URL="your-railway-url" npm run fix-admin-email`
+
+**Option B – Manual SQL:** Update `"user"` table: `UPDATE "user" SET email = 'mail@massimedia.dk' WHERE email = 'mail@massiemdia.dk';`  
+Then find auth tables with `SELECT table_schema, table_name FROM information_schema.tables WHERE table_name LIKE '%provider%' OR table_name LIKE '%identity%';` and update the provider identity table's `entity_id` column.
+
 ---
 
 ## 3. Deploy Storefront to Vercel

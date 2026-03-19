@@ -39,6 +39,8 @@ COPY --from=builder /app/.medusa/server/instrumentation.js ./instrumentation.js
 # Don't copy raw src/ - it has .ts files that cause "Unexpected token ':'" when loaded. Use compiled .medusa/server only.
 # Admin loader expects public/admin at project root, but build outputs to .medusa/server/public/admin
 RUN mkdir -p public && cp -r .medusa/server/public/admin public/
+# Copy scripts for pre-deploy one-offs (reset-admin-password, fix-admin-email)
+COPY --from=builder /app/src/scripts ./src/scripts
 
 ENV NODE_ENV=production
 
