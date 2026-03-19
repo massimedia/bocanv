@@ -30,9 +30,9 @@ RUN npm ci --omit=dev --legacy-peer-deps
 
 # Copy built output and source from builder
 COPY --from=builder /app/.medusa ./.medusa
-COPY --from=builder /app/medusa-config.ts ./
-COPY --from=builder /app/tsconfig.json ./
-COPY --from=builder /app/instrumentation.ts ./
+# Medusa requires medusa-config.js at project root (build outputs to .medusa/server/)
+COPY --from=builder /app/.medusa/server/medusa-config.js ./medusa-config.js
+COPY --from=builder /app/.medusa/server/instrumentation.js ./instrumentation.js
 COPY --from=builder /app/src ./src
 
 ENV NODE_ENV=production
