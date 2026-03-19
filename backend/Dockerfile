@@ -34,6 +34,8 @@ COPY --from=builder /app/.medusa ./.medusa
 COPY --from=builder /app/.medusa/server/medusa-config.js ./medusa-config.js
 COPY --from=builder /app/.medusa/server/instrumentation.js ./instrumentation.js
 COPY --from=builder /app/src ./src
+# Admin loader expects public/admin at project root, but build outputs to .medusa/server/public/admin
+RUN mkdir -p public && cp -r .medusa/server/public/admin public/
 
 ENV NODE_ENV=production
 
