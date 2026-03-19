@@ -33,7 +33,7 @@ COPY --from=builder /app/.medusa ./.medusa
 # Medusa requires medusa-config.js at project root (build outputs to .medusa/server/)
 COPY --from=builder /app/.medusa/server/medusa-config.js ./medusa-config.js
 COPY --from=builder /app/.medusa/server/instrumentation.js ./instrumentation.js
-COPY --from=builder /app/src ./src
+# Don't copy raw src/ - it has .ts files that cause "Unexpected token ':'" when loaded. Use compiled .medusa/server only.
 # Admin loader expects public/admin at project root, but build outputs to .medusa/server/public/admin
 RUN mkdir -p public && cp -r .medusa/server/public/admin public/
 
