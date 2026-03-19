@@ -14,6 +14,9 @@ COPY medusa-config.ts tsconfig.json ./
 COPY src ./src
 COPY instrumentation.ts ./
 
+# Use relative URL so admin works when served from same origin (avoids localhost:9000 baked in)
+ENV BACKEND_URL=/
+
 # Build - creates .medusa/server with admin
 RUN npx medusa build
 
