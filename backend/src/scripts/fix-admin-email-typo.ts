@@ -55,20 +55,8 @@ Manual SQL (run in Railway PostgreSQL):
       logger.info(`Updated provider_identity ${pi.id}`);
     }
 
-    // 2. Update user table email
-    const { data: users } = await query.graph({
-      entity: "user",
-      fields: ["id", "email"],
-      filters: { email: OLD_EMAIL },
-    });
-
-    if (users?.length) {
-      const userModule = container.resolve(Modules.USER);
-      for (const u of users) {
-        await userModule.updateUsers({ id: u.id, email: NEW_EMAIL });
-        logger.info(`Updated user ${u.id}`);
-      }
-    }
+    // 2. Update user table email (UpdateUserDTO does not include email - login uses provider_identity)
+    // Skip user table; provider_identity.entity_id is what auth uses.
 
     logger.info("Done. You can now log in with mail@massimedia.dk");
   } catch (err) {

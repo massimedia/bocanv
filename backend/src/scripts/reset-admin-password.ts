@@ -33,7 +33,7 @@ export default async function resetAdminPassword({ container }: ExecArgs) {
     });
 
     if (result?.error) {
-      logger.error("Failed:", result.error);
+      logger.error(`Failed: ${result.error}`);
       process.exit(1);
     }
 
