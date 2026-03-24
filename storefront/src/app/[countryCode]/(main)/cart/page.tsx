@@ -1,3 +1,4 @@
+import { listCateringProductIds } from "@lib/data/catering"
 import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import CartTemplate from "@modules/cart/templates"
@@ -9,13 +10,23 @@ export const metadata: Metadata = {
   description: "View your cart",
 }
 
-export default async function Cart() {
+export default async function Cart(props: {
+  params: Promise<{ countryCode: string }>
+}) {
+  const params = await props.params
   const cart = await retrieveCart().catch((error) => {
     console.error(error)
     return notFound()
   })
 
   const customer = await retrieveCustomer()
+  const cateringProductIds = await listCateringProductIds(params.countryCode)
 
-  return <CartTemplate cart={cart} customer={customer} />
+  return (
+    <CartTemplate
+      cart={cart}
+      customer={customer}
+      cateringProductIds={cateringProductIds}
+    />
+  )
 }

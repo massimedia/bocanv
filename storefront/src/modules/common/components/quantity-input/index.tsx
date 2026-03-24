@@ -1,7 +1,7 @@
 "use client"
 
 import { clx } from "@medusajs/ui"
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef } from "react"
 
 type QuickAdd = {
   label: string
@@ -11,6 +11,10 @@ type QuickAdd = {
 type QuantityInputProps = {
   value: number
   onChange: (value: number) => void
+  /** Fired when the value should be persisted (e.g. synced to cart). Immediate for buttons, debounced for typed input. */
+  onCommit?: (value: number) => void
+  /** Debounce delay (ms) for typed input commits. Only meaningful when onCommit is set. */
+  commitDebounceMs?: number
   min?: number
   max?: number
   step?: number
@@ -27,6 +31,8 @@ const DEFAULT_QUICK_ADDS: QuickAdd[] = [
 export default function QuantityInput({
   value,
   onChange,
+  onCommit,
+  commitDebounceMs = 400,
   min = 0,
   max = 999,
   step = 1,
@@ -39,27 +45,59 @@ export default function QuantityInput({
     [min, max]
   )
 
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
+
+  const commitImmediate = useCallback(
+    (v: number) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      onCommit?.(v)
+    },
+    [onCommit]
+  )
+
+  const commitDebounced = useCallback(
+    (v: number) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => onCommit?.(v), commitDebounceMs)
+    },
+    [onCommit, commitDebounceMs]
+  )
+
   const handleDecrement = () => {
-    onChange(clamp(value - step))
+    const next = clamp(value - step)
+    onChange(next)
+    commitImmediate(next)
   }
 
   const handleIncrement = () => {
-    onChange(clamp(value + step))
+    const next = clamp(value + step)
+    onChange(next)
+    commitImmediate(next)
   }
 
   const handleQuickAdd = (amount: number) => {
-    onChange(clamp(value + amount))
+    const next = clamp(value + amount)
+    onChange(next)
+    commitImmediate(next)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value
     if (raw === "") {
       onChange(min)
+      commitDebounced(min)
       return
     }
     const parsed = parseInt(raw, 10)
     if (!isNaN(parsed)) {
-      onChange(clamp(parsed))
+      const clamped = clamp(parsed)
+      onChange(clamped)
+      commitDebounced(clamped)
     }
   }
 
@@ -82,6 +120,7 @@ export default function QuantityInput({
           inputMode="numeric"
           value={value}
           onChange={handleInputChange}
+          onFocus={(e) => e.target.select()}
           disabled={disabled}
           className="w-12 text-center text-sm font-semibold text-brand-dark bg-transparent border-x border-brand-dark-100 py-1.5 focus:outline-none disabled:opacity-50"
           aria-label="Quantity"

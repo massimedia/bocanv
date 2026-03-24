@@ -1,3 +1,4 @@
+import { listCateringProductIds } from "@lib/data/catering"
 import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
   title: "Checkout",
 }
 
-export default async function Checkout() {
+export default async function Checkout(props: {
+  params: Promise<{ countryCode: string }>
+}) {
+  const params = await props.params
   const cart = await retrieveCart()
 
   if (!cart) {
@@ -18,11 +22,16 @@ export default async function Checkout() {
   }
 
   const customer = await retrieveCustomer()
+  const cateringProductIds = await listCateringProductIds(params.countryCode)
 
   return (
     <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
       <PaymentWrapper cart={cart}>
-        <CheckoutForm cart={cart} customer={customer} />
+        <CheckoutForm
+          cart={cart}
+          customer={customer}
+          cateringProductIds={cateringProductIds}
+        />
       </PaymentWrapper>
       <CheckoutSummary cart={cart} />
     </div>

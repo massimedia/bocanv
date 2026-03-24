@@ -2,6 +2,7 @@
 
 import { isManual, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
+import { isCateringMinimumBlocking } from "@lib/util/catering-cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -10,11 +11,13 @@ import ErrorMessage from "../error-message"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
+  cateringProductIds?: string[]
   "data-testid": string
 }
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
   cart,
+  cateringProductIds = [],
   "data-testid": dataTestId,
 }) => {
   const notReady =
@@ -24,20 +27,23 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
+  const cateringBlocked = isCateringMinimumBlocking(cart, cateringProductIds)
+  const payNotReady = notReady || cateringBlocked
+
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
 
   switch (true) {
     case isStripeLike(paymentSession?.provider_id):
       return (
         <StripePaymentButton
-          notReady={notReady}
+          notReady={payNotReady}
           cart={cart}
           data-testid={dataTestId}
         />
       )
     case isManual(paymentSession?.provider_id):
       return (
-        <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
+        <ManualTestPaymentButton notReady={payNotReady} data-testid={dataTestId} />
       )
     default:
       return <Button disabled>Select a payment method</Button>

@@ -2,16 +2,11 @@ import Link from "next/link"
 
 import Container from "@modules/common/components/container"
 import { brandButtonClasses } from "@modules/common/components/button/classes"
+import { CATERING_FACTS } from "@modules/catering/content"
 
 type CateringSpotlightProps = {
   countryCode: string
 }
-
-const FACTS = [
-  { label: "Minimum order", value: "30 empanadas" },
-  { label: "Preparation", value: "Frozen or baked" },
-  { label: "Built for", value: "Offices & parties" },
-] as const
 
 export default function CateringSpotlight({ countryCode }: CateringSpotlightProps) {
   const base = `/${countryCode}`
@@ -47,7 +42,7 @@ export default function CateringSpotlight({ countryCode }: CateringSpotlightProp
               The gist
             </p>
             <ul className="space-y-6">
-              {FACTS.map((f) => (
+              {CATERING_FACTS.map((f) => (
                 <li
                   key={f.label}
                   className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 border-b border-brand-dark/10 pb-6 last:border-0 last:pb-0"

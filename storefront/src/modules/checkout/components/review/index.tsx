@@ -2,10 +2,21 @@
 
 import { Heading, Text, clx } from "@medusajs/ui"
 
+import {
+  getCateringPiecesInCart,
+  isCateringMinimumBlocking,
+  MIN_CATERING_PIECES,
+} from "@lib/util/catering-cart"
 import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
 
-const Review = ({ cart }: { cart: any }) => {
+const Review = ({
+  cart,
+  cateringProductIds = [],
+}: {
+  cart: any
+  cateringProductIds?: string[]
+}) => {
   const searchParams = useSearchParams()
 
   const isOpen = searchParams.get("step") === "review"
@@ -17,6 +28,9 @@ const Review = ({ cart }: { cart: any }) => {
     cart.shipping_address &&
     cart.shipping_methods.length > 0 &&
     (cart.payment_collection || paidByGiftcard)
+
+  const cateringBlocked = isCateringMinimumBlocking(cart, cateringProductIds)
+  const cateringCount = getCateringPiecesInCart(cart, cateringProductIds)
 
   return (
     <div className="bg-white">
@@ -35,6 +49,13 @@ const Review = ({ cart }: { cart: any }) => {
       </div>
       {isOpen && previousStepsCompleted && (
         <>
+          {cateringBlocked && (
+            <div className="mb-4 rounded-lg border border-brand-red-200 bg-brand-red-50 px-4 py-3 text-sm text-brand-dark">
+              Catering orders require at least {MIN_CATERING_PIECES} pieces.
+              Your cart has {cateringCount} catering pieces. Add more from the
+              catering page or remove catering items to continue.
+            </div>
+          )}
           <div className="flex items-start gap-x-1 w-full mb-6">
             <div className="w-full">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -45,7 +66,11 @@ const Review = ({ cart }: { cart: any }) => {
               </Text>
             </div>
           </div>
-          <PaymentButton cart={cart} data-testid="submit-order-button" />
+          <PaymentButton
+            cart={cart}
+            cateringProductIds={cateringProductIds}
+            data-testid="submit-order-button"
+          />
         </>
       )}
     </div>

@@ -65,9 +65,13 @@ const CartDropdown = ({
 
   const pathname = usePathname()
 
-  // open cart dropdown when modifying the cart items, but only if we're not on the cart page
+  // open cart dropdown when modifying the cart items, but not on cart or catering pages
   useEffect(() => {
-    if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
+    if (
+      itemRef.current !== totalItems &&
+      !pathname.includes("/cart") &&
+      !pathname.includes("/catering")
+    ) {
       timedOpen()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -12,6 +12,16 @@ Quick reference for building and deploying Bocanv (Medusa backend + Next.js stor
 | Admin | https://medusa-backend-production-8203.up.railway.app/app |
 | Storefront | https://bocanv.vercel.app |
 
+### Catering page (storefront)
+
+Configure in **Medusa Admin** only (no backend code changes):
+
+1. **Product handle(s)** — By default the storefront loads the product whose handle is **`empanada-catering`** (e.g. “Empanada Catering”). Override or add more with **`NEXT_PUBLIC_CATERING_PRODUCT_HANDLES`** (comma-separated handles).
+2. **Collection (optional)** — If **`NEXT_PUBLIC_CATERING_COLLECTION_HANDLE`** is set and that collection exists, the storefront uses **all products in the collection** instead of the product-handle list.
+3. **Frozen / baked** — Each catering product should have a **Preparation** option (override name via `NEXT_PUBLIC_CATERING_PREPARATION_OPTION_TITLE` if needed) with values **Frozen** and **Baked**, as variants with correct pricing.
+4. **Diet filter** — On each product, set **metadata** `diet` to `vegan`, `vegetarian`, or `meat` (lowercase), or use tags like `diet-vegan`. Products without `diet` only appear under **All** on the catering page.
+5. **Minimum** — The storefront enforces **30 pieces** for carts that include any catering catalog product (catering page, cart, and checkout).
+
 ---
 
 ## 1. Backend (Railway)

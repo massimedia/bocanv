@@ -157,6 +157,55 @@ export async function addToCart({
     .catch(medusaError)
 }
 
+/**
+ * Sets absolute quantity for a variant on the cart (creates, updates, or removes line).
+ * Fetches a fresh cart with items to avoid stale-cache mismatches.
+ */
+export async function setLineItemQuantityForVariant({
+  variantId,
+  quantity,
+  countryCode,
+}: {
+  variantId: string
+  quantity: number
+  countryCode: string
+}) {
+  if (!variantId) {
+    throw new Error("Missing variant ID")
+  }
+
+  const cart = await getOrSetCart(countryCode)
+  if (!cart) {
+    throw new Error("Error retrieving or creating cart")
+  }
+
+  const headers = { ...(await getAuthHeaders()) }
+  const freshCart = await sdk.client
+    .fetch<{ cart: HttpTypes.StoreCart }>(`/store/carts/${cart.id}`, {
+      method: "GET",
+      query: { fields: "+items,+items.variant_id" },
+      headers,
+      cache: "no-store",
+    })
+    .then((r) => r.cart)
+
+  const line = freshCart.items?.find((i) => i.variant_id === variantId)
+
+  if (quantity <= 0) {
+    if (line?.id) {
+      await deleteLineItem(line.id)
+    }
+    return
+  }
+
+  if (line?.id) {
+    await updateLineItem({ lineId: line.id, quantity })
+    return
+  }
+
+  await addToCart({ variantId, quantity, countryCode })
+}
+
 export async function updateLineItem({
   lineId,
   quantity,
