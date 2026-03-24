@@ -13,7 +13,7 @@ export default function CateringHero({ countryCode }: CateringHeroProps) {
   const base = `/${countryCode}`
 
   return (
-    <section className="border-b border-brand-dark/10 bg-brand-cream py-14 md:py-20">
+    <section className="bg-brand-cream py-14 md:py-20">
       <Container>
         <p className="text-sm font-semibold uppercase tracking-wider text-brand-red">
           Catering

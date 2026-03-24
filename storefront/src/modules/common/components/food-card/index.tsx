@@ -32,7 +32,7 @@ export default function FoodCard({
   return (
     <div
       className={clx(
-        "group relative flex h-full flex-col bg-white rounded-xl overflow-hidden border border-brand-dark/10 shadow-sm hover:shadow-md transition-shadow duration-200",
+        "group relative flex h-full flex-col bg-brand-cream-400 rounded-xl overflow-hidden border border-brand-dark/5 transition-shadow duration-200",
         className
       )}
     >

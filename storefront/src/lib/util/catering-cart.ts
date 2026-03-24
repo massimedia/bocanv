@@ -2,6 +2,7 @@ import { HttpTypes } from "@medusajs/types"
 
 /** Must match copy on catering page / Admin docs */
 export const MIN_CATERING_PIECES = 30
+export const MAX_CATERING_PIECES_READY_TO_SERVE = 100
 
 export function getCateringPiecesInCart(
   cart: HttpTypes.StoreCart | null | undefined,
@@ -43,4 +44,17 @@ export function isCateringMinimumBlocking(
     return false
   }
   return getCateringPiecesInCart(cart, cateringProductIds) < MIN_CATERING_PIECES
+}
+
+/** True when ready-to-serve is enabled and catering pieces exceed the max */
+export function isCateringMaxExceeded(
+  cart: HttpTypes.StoreCart | null | undefined,
+  cateringProductIds: string[],
+  readyToServe: boolean
+): boolean {
+  if (!readyToServe) return false
+  return (
+    getCateringPiecesInCart(cart, cateringProductIds) >
+    MAX_CATERING_PIECES_READY_TO_SERVE
+  )
 }

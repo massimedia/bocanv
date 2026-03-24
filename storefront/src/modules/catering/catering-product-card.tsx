@@ -147,6 +147,7 @@ export default function CateringProductCard({
           min={0}
           max={999}
           disabled={!inStock || syncing}
+          variant="pill"
         />
         {syncing && (
           <span className="text-xs text-brand-dark-300 animate-pulse">

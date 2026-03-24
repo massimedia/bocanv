@@ -104,6 +104,8 @@ module.exports = {
           100: "#FFFAEC",
           200: "#FFF7DF",
           300: "#FFF4D6",
+          400: "#EDE5D0",
+          500: "#DDD5C0",
           DEFAULT: "#FFF4D6",
         },
         "brand-dark": {
