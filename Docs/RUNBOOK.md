@@ -141,6 +141,16 @@ Delete user/auth (see Clean Slate), fix `MEDUSA_ADMIN_EMAIL` in variables, redep
 - Use `DATABASE_PUBLIC_URL` (not `DATABASE_URL`) for external connections.
 - Enable TCP Proxy on PostgreSQL service.
 
+### Copy production DB → local Docker (replace demo data)
+
+1. `docker compose up -d` (Postgres on `5433`, Redis on `6380`).
+2. `cp backend/.env.railway.example backend/.env.railway` and set `export DATABASE_PUBLIC_URL='…'`
+   from Railway (TCP proxy enabled). **Never commit** `backend/.env.railway`.
+3. From repo root: `./scripts/sync-local-db-from-railway.sh`  
+   This **drops** the local `public` schema and restores from Railway (all local Medusa data is replaced).
+4. Restart backend; set `storefront/.env.local` **publishable key** from
+   `http://localhost:9000/app` → Settings → Publishable API Keys.
+
 ---
 
 ## 5. Project Structure

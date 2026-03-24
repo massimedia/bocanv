@@ -46,6 +46,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.prod.website-files.com",
+      },
       ...(S3_HOSTNAME && S3_PATHNAME
         ? [
             {

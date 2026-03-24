@@ -5,6 +5,10 @@ node_modules/
 .env
 .env.local
 .env.*.local
+backend/.env.railway
+
+# Local DB dumps from production (may contain PII — never commit)
+.dumps/
 
 # Build outputs
 .next/

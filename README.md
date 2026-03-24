@@ -44,6 +44,8 @@ npm run dev
 
 Admin: http://localhost:9000/app
 
+To sync **production data** from Railway into local Docker Postgres (replaces local DB), see **Docs/RUNBOOK.md** → *Copy production DB → local Docker* and run `./scripts/sync-local-db-from-railway.sh`.
+
 ### 2. Storefront
 
 ```bash
