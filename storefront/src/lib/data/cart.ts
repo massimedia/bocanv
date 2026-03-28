@@ -502,8 +502,14 @@ export async function updateRegion(countryCode: string, currentPath: string) {
   redirect(`/${countryCode}${currentPath}`)
 }
 
-export async function listCartOptions() {
+export async function listCartOptions(): Promise<{
+  shipping_options: HttpTypes.StoreCartShippingOption[]
+}> {
   const cartId = await getCartId()
+  if (!cartId) {
+    return { shipping_options: [] }
+  }
+
   const headers = {
     ...(await getAuthHeaders()),
   }
@@ -511,12 +517,14 @@ export async function listCartOptions() {
     ...(await getCacheOptions("shippingOptions")),
   }
 
-  return await sdk.client.fetch<{
-    shipping_options: HttpTypes.StoreCartShippingOption[]
-  }>("/store/shipping-options", {
-    query: { cart_id: cartId },
-    next,
-    headers,
-    cache: "force-cache",
-  })
+  return await sdk.client
+    .fetch<{
+      shipping_options: HttpTypes.StoreCartShippingOption[]
+    }>("/store/shipping-options", {
+      query: { cart_id: cartId },
+      next,
+      headers,
+      cache: "force-cache",
+    })
+    .catch(() => ({ shipping_options: [] }))
 }

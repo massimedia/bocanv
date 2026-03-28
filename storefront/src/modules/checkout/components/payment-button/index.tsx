@@ -2,7 +2,10 @@
 
 import { isManual, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
-import { isCateringMinimumBlocking } from "@lib/util/catering-cart"
+import {
+  isCateringMinimumBlocking,
+  isCateringScheduleIncomplete,
+} from "@lib/util/catering-cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -28,7 +31,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     (cart.shipping_methods?.length ?? 0) < 1
 
   const cateringBlocked = isCateringMinimumBlocking(cart, cateringProductIds)
-  const payNotReady = notReady || cateringBlocked
+  const cateringScheduleBlocked = isCateringScheduleIncomplete(
+    cart,
+    cateringProductIds
+  )
+  const payNotReady =
+    notReady || cateringBlocked || cateringScheduleBlocked
 
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
 

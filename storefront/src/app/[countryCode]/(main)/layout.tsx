@@ -20,8 +20,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
 
   if (cart) {
     const { shipping_options } = await listCartOptions()
-
-    shippingOptions = shipping_options
+    shippingOptions = shipping_options ?? []
   }
 
   return (

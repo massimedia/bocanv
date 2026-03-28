@@ -30,6 +30,7 @@ export default async function Checkout(props: {
         <CheckoutForm
           cart={cart}
           customer={customer}
+          countryCode={params.countryCode}
           cateringProductIds={cateringProductIds}
         />
       </PaymentWrapper>

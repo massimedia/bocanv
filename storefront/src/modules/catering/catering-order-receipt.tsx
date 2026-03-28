@@ -5,9 +5,12 @@ import Link from "next/link"
 import { deleteLineItem } from "@lib/data/cart"
 import {
   getCateringPiecesInCart,
+  isCateringOnlyCart,
+  isCateringScheduleIncomplete,
   MAX_CATERING_PIECES_READY_TO_SERVE,
   MIN_CATERING_PIECES,
 } from "@lib/util/catering-cart"
+import { CATERING_MIN_LEAD_HOURS } from "@lib/util/catering-pickup"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { AlertTriangle, CheckCircle } from "lucide-react"
@@ -75,7 +78,10 @@ export default function CateringOrderReceipt({
   const exceededMax =
     readyToServe && cateringPieces > MAX_CATERING_PIECES_READY_TO_SERVE
   const hasCateringLines = cateringPieces > 0
-  const blockCheckout = !metMin || exceededMax
+  const scheduleIncomplete =
+    isCateringOnlyCart(cart, cateringProductIds) &&
+    isCateringScheduleIncomplete(cart, cateringProductIds)
+  const blockCheckout = !metMin || exceededMax || scheduleIncomplete
   const currency = cart?.currency_code ?? "usd"
   const base = `/${countryCode}`
 
@@ -194,6 +200,22 @@ export default function CateringOrderReceipt({
                   proceed.
                 </p>
               </div>
+            </div>
+          ) : metMin && scheduleIncomplete ? (
+            <div className="flex flex-col gap-1 rounded-lg bg-brand-yellow/20 px-3 py-2.5">
+              <p className="text-xs font-bold uppercase tracking-wide text-brand-dark">
+                Pickup &amp; time needed
+              </p>
+              <p className="text-xs text-brand-dark-300">
+                Choose a store, date, and pickup hour (10:00–18:00, at least{" "}
+                {CATERING_MIN_LEAD_HOURS} hours ahead) below before checkout.
+              </p>
+              <a
+                href="#catering-pickup"
+                className="text-xs font-semibold text-brand-red underline-offset-2 hover:underline"
+              >
+                Go to pickup &amp; time
+              </a>
             </div>
           ) : metMin ? (
             <div className="flex items-center gap-2 rounded-lg bg-brand-green/15 px-3 py-2.5">

@@ -3,6 +3,7 @@
 import { updateCart } from "@lib/data/cart"
 import {
   getCateringPiecesInCart,
+  isCateringOnlyCart,
   MAX_CATERING_PIECES_READY_TO_SERVE,
   MIN_CATERING_PIECES,
 } from "@lib/util/catering-cart"
@@ -19,9 +20,10 @@ import {
   Vegan,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import CateringOrderReceipt from "./catering-order-receipt"
+import CateringPickupStep from "./catering-pickup-step"
 import CateringProductCard from "./catering-product-card"
 import {
   cateringVariantMatchesDietFilter,
@@ -47,8 +49,8 @@ const PREP: {
 }[] = [
   {
     id: "baked",
-    label: "Baked & Ready",
-    description: "Perfect for immediate enjoyment. Arrives warm and golden brown.",
+    label: "Baked & Ready to Heat",
+    description: "Baked and cooled. Reheat them when it's time to serve.",
     Icon: Utensils,
   },
   {
@@ -99,13 +101,37 @@ export default function CateringOrderSection({
   const toggleReadyToServe = useCallback(async () => {
     const next = !readyToServe
     setReadyToServe(next)
+    if (!cart) return
     try {
-      await updateCart({ metadata: { ready_to_serve: String(next) } })
+      const prev = (cart.metadata ?? {}) as Record<string, string>
+      await updateCart({
+        metadata: {
+          ...prev,
+          ready_to_serve: String(next),
+        },
+      })
       router.refresh()
     } catch {
       setReadyToServe(!next)
     }
-  }, [readyToServe, router])
+  }, [cart, readyToServe, router])
+
+  // Sync ready_to_serve metadata once a cart appears (first item added).
+  const syncedCartIdRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!cart || syncedCartIdRef.current === cart.id) return
+    const meta = (cart.metadata ?? {}) as Record<string, string>
+    if (meta.ready_to_serve === String(readyToServe)) {
+      syncedCartIdRef.current = cart.id
+      return
+    }
+    syncedCartIdRef.current = cart.id
+    updateCart({
+      metadata: { ...meta, ready_to_serve: String(readyToServe) },
+    })
+      .then(() => router.refresh())
+      .catch(() => {})
+  }, [cart?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const lineQuantities = useMemo(() => buildLineQuantities(cart), [cart])
 
@@ -132,6 +158,7 @@ export default function CateringOrderSection({
     () => getCateringPiecesInCart(cart, cateringProductIds),
     [cart, cateringProductIds]
   )
+  const metMin = cateringPieces >= MIN_CATERING_PIECES
 
   const effectiveMax =
     readyToServe && prep === "baked"
@@ -328,6 +355,22 @@ export default function CateringOrderSection({
                 )}
               </div>
             </div>
+
+            {/* ── Step 03: Pickup — catering-only carts after minimum ── */}
+            {metMin && cart && isCateringOnlyCart(cart, cateringProductIds) && (
+              <div className="mt-12">
+                <CateringPickupStep cart={cart} countryCode={countryCode} />
+              </div>
+            )}
+            {metMin &&
+              cart &&
+              !isCateringOnlyCart(cart, cateringProductIds) &&
+              getCateringPiecesInCart(cart, cateringProductIds) > 0 && (
+                <div className="mt-12 rounded-xl border border-brand-dark/10 bg-brand-cream-400 p-5 text-sm text-brand-dark-300">
+                  This cart includes items outside the catering menu. Choose
+                  shipping or pickup on the checkout page.
+                </div>
+              )}
           </div>
 
           {/* Right column — sticky receipt sidebar, aligned to top */}

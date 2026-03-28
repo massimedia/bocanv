@@ -5,8 +5,10 @@ import { Heading, Text, clx } from "@medusajs/ui"
 import {
   getCateringPiecesInCart,
   isCateringMinimumBlocking,
+  isCateringScheduleIncomplete,
   MIN_CATERING_PIECES,
 } from "@lib/util/catering-cart"
+import { CATERING_MIN_LEAD_HOURS } from "@lib/util/catering-pickup"
 import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
 
@@ -30,6 +32,10 @@ const Review = ({
     (cart.payment_collection || paidByGiftcard)
 
   const cateringBlocked = isCateringMinimumBlocking(cart, cateringProductIds)
+  const cateringScheduleBlocked = isCateringScheduleIncomplete(
+    cart,
+    cateringProductIds
+  )
   const cateringCount = getCateringPiecesInCart(cart, cateringProductIds)
 
   return (
@@ -54,6 +60,13 @@ const Review = ({
               Catering orders require at least {MIN_CATERING_PIECES} pieces.
               Your cart has {cateringCount} catering pieces. Add more from the
               catering page or remove catering items to continue.
+            </div>
+          )}
+          {cateringScheduleBlocked && (
+            <div className="mb-4 rounded-lg border border-brand-yellow bg-brand-cream-400 px-4 py-3 text-sm text-brand-dark">
+              Complete catering pickup (store, date, and hourly pickup time at
+              least {CATERING_MIN_LEAD_HOURS} hours ahead) on the catering page
+              before placing your order.
             </div>
           )}
           <div className="flex items-start gap-x-1 w-full mb-6">
